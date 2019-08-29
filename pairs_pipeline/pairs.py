@@ -15,7 +15,6 @@
 import pandas as pd
 import numpy as np
 from statsmodels.tsa.vector_ar.vecm import coint_johansen
-from statsmodels.api import OLS
 from moonshot import Moonshot
 from moonshot.commission import PerShareCommission
 
@@ -143,7 +142,7 @@ class PairsStrategy(Moonshot):
 class GDX_GLD_Pair(PairsStrategy):
 
     CODE = "pairs-gdx-gld"
-    DB = "arca-legacy-etf-1d-p"
+    DB = "usa-etf-1d-p"
     CONIDS = [
         229726316, # GDX
         51529211, # GLD
