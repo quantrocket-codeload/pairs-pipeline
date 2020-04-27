@@ -19,7 +19,7 @@ from moonshot import Moonshot
 from moonshot.commission import PerShareCommission
 
 class USStockCommission(PerShareCommission):
-    IB_COMMISSION_PER_SHARE = 0.005
+    BROKER_COMMISSION_PER_SHARE = 0.005
 
 class PairsStrategy(Moonshot):
     """
@@ -29,13 +29,13 @@ class PairsStrategy(Moonshot):
     Bollinger Band and exits when it crosses its moving average.
 
     To use the strategy, subclass this base class and define the appropriate
-    DB and CONIDS.
+    DB and SIDS.
     """
 
     CODE = "pairs"
     DB = None
     DB_FIELDS = ["Close", "Open"]
-    CONIDS = []
+    SIDS = []
     LOOKBACK_WINDOW = 20 # Calculate hedge ratios and Bollinger Bands using this lookback
     BBAND_STD = 1 # Set Bollinger Bands this many standard deviations away from mean
     COMMISSION_CLASS = USStockCommission
@@ -142,8 +142,8 @@ class PairsStrategy(Moonshot):
 class GDX_GLD_Pair(PairsStrategy):
 
     CODE = "pairs-gdx-gld"
-    DB = "usa-etf-1d-p"
-    CONIDS = [
-        229726316, # GDX
-        51529211, # GLD
+    DB = "usstock-1d"
+    SIDS = [
+        "FIBBG000PLNQN7", # GDX
+        "FIBBG000CRF6Q8", # GLD
     ]
