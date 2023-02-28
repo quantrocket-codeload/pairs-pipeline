@@ -13,7 +13,6 @@
 # limitations under the License.
 
 import pandas as pd
-import numpy as np
 from statsmodels.tsa.vector_ar.vecm import coint_johansen
 from moonshot import Moonshot
 from moonshot.commission import PerShareCommission
@@ -40,7 +39,7 @@ class PairsStrategy(Moonshot):
     BBAND_STD = 1 # Set Bollinger Bands this many standard deviations away from mean
     COMMISSION_CLASS = USStockCommission
 
-    def get_hedge_ratio(self, pair_prices):
+    def get_hedge_ratio(self, pair_prices: pd.DataFrame):
         """
         Helper function that uses the Johansen test to calculate hedge ratio. This is applied
         to the pair prices on a rolling basis in prices_to_signals.
@@ -60,7 +59,7 @@ class PairsStrategy(Moonshot):
 
         return pd.Series(weights, index=pair_prices.columns)
 
-    def prices_to_signals(self, prices):
+    def prices_to_signals(self, prices: pd.DataFrame):
         """
         Generates a DataFrame of signals indicating whether to long or short the
         spread.
@@ -111,7 +110,7 @@ class PairsStrategy(Moonshot):
 
         return signals
 
-    def signals_to_target_weights(self, signals, prices):
+    def signals_to_target_weights(self, signals: pd.DataFrame, prices: pd.DataFrame):
         """
         Converts the DataFrame of integer signals, indicating whether to long
         or short the spread, into the corresponding weight of each instrument
@@ -128,12 +127,12 @@ class PairsStrategy(Moonshot):
         weights = weights.div(total_weights, axis=0)
         return weights
 
-    def target_weights_to_positions(self, weights, prices):
+    def target_weights_to_positions(self, weights: pd.DataFrame, prices: pd.DataFrame):
         # we'll enter in the period after the signal
         positions = weights.shift()
         return positions
 
-    def positions_to_gross_returns(self, positions, prices):
+    def positions_to_gross_returns(self, positions: pd.DataFrame, prices: pd.DataFrame):
         # Enter and exit on the open
         opens = prices.loc["Open"]
         gross_returns = opens.pct_change() * positions.shift()
