@@ -1,4 +1,4 @@
-# Copyright 2019 QuantRocket LLC - All Rights Reserved
+# Copyright 2019-2024 QuantRocket LLC - All Rights Reserved
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -55,7 +55,7 @@ class PairsStrategy(Moonshot):
         result = coint_johansen(pair_prices, 0, 1)
 
         # The first column of eigenvectors contains the best weights
-        weights = list(result.evec[0])
+        weights = list(result.evec[:, 0])
 
         return pd.Series(weights, index=pair_prices.columns)
 
@@ -82,8 +82,8 @@ class PairsStrategy(Moonshot):
         # Compute spread and Bollinger Bands (spreads and everything derived
         # from it is a Series, which we later broadcast back to a DataFrame)
         spreads = (closes * hedge_ratios).sum(axis=1)
-        means = spreads.fillna(method="ffill").rolling(self.LOOKBACK_WINDOW).mean()
-        stds = spreads.fillna(method="ffill").rolling(self.LOOKBACK_WINDOW).std()
+        means = spreads.ffill().rolling(self.LOOKBACK_WINDOW).mean()
+        stds = spreads.ffill().rolling(self.LOOKBACK_WINDOW).std()
         upper_bands = means + self.BBAND_STD * stds
         lower_bands = means - self.BBAND_STD * stds
 
@@ -98,8 +98,8 @@ class PairsStrategy(Moonshot):
         ones = pd.Series(1, index=spreads.index)
         zeros = pd.Series(0, index=spreads.index)
         minus_ones = pd.Series(-1, index=spreads.index)
-        long_signals = ones.where(long_entries).fillna(zeros.where(long_exits)).fillna(method="ffill")
-        short_signals = minus_ones.where(short_entries).fillna(zeros.where(short_exits)).fillna(method="ffill")
+        long_signals = ones.where(long_entries).fillna(zeros.where(long_exits)).ffill()
+        short_signals = minus_ones.where(short_entries).fillna(zeros.where(short_exits)).ffill()
         signals = long_signals + short_signals
 
         # Broadcast Series of signals to DataFrame
